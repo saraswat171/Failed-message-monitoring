@@ -1,0 +1,75 @@
+# Hello CI/CD World
+
+default:
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+
+
+
+variables:
+  # When using dind service, you must instruct docker to talk with the
+  # daemon started inside of the service. The daemon is available with
+  # a network connection instead of the default /var/run/docker.sock socket.
+  #
+  # The 'docker' hostname is the alias of the service container as described at
+  # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#accessing-the-services
+  #
+  # If you're using GitLab Runner 12.7 or earlier with the Kubernetes executor and Kubernetes 1.6 or earlier,
+  # the variable must be set to tcp://localhost:2375 because of how the
+  # Kubernetes executor connects services to the job container
+  # DOCKER_HOST: tcp://localhost:2375
+  #
+  DOCKER_HOST: tcp://docker:2375
+  #
+  # This instructs Docker not to start over TLS.
+  DOCKER_TLS_CERTDIR: ""
+
+  CONTAINER_IMAGE: keshavsaini22/failed-messages-monitoring:latestv1
+
+  #BRANCH
+  FEATURE_BRANCH: /^feature\/.*/
+  RELEASE_BRANCH: /^release\/\d+\.\d+\.\d+$/
+  HOTFIX_BRANCH: /^hotfix\/.*/
+
+
+
+stages:
+  - build
+  - deploy
+
+
+
+build-develop:
+  stage: build
+  before_script:
+    - BUILD_ENV=production
+  script:
+    - echo "Logging into Docker..."
+    - echo "$DOCKER_ACCESS_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - apk add bash
+    - ./etc/ci-cd/build.sh .
+  artifacts:
+    paths:
+      - .env
+    expire_in: "1 days" 
+  rules:
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ $FEATURE_BRANCH
+
+
+  
+kubernetes-develop:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint:
+      - ""
+  dependencies:
+    - build-develop
+  before_script:
+    - BUILD_ENV=production
+  script:
+    - 'echo "${KUBE_CONFIG}" > /.kube/config'
+    - ./etc/ci-cd/deploy.kubectl.sh .
+  rules:
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ $FEATURE_BRANCH

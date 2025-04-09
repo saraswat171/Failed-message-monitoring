@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{KUB_SERVICE_NAME}-migrate"
+  namespace: "{KUB_NAMESPACE_PREFIX}-{BUILD_ENV}"
+  labels:
+    app: "{KUB_SERVICE_NAME}"
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app: "{KUB_SERVICE_NAME}"
+    spec:
+      containers:
+        - name: "{KUB_SERVICE_NAME}"
+          image: localhost:32000/image:latest
+          imagePullPolicy: Always
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              cd /app
+              npm run up
+      restartPolicy: Never

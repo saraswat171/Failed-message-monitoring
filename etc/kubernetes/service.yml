@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{KUB_SERVICE_NAME}"
+  namespace: "{KUB_NAMESPACE_PREFIX}-{BUILD_ENV}"
+  labels:
+    app: "{KUB_SERVICE_NAME}"
+spec:
+  type: LoadBalancer
+  selector:
+    app: "{KUB_SERVICE_NAME}"
+  sessionAffinity: None
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8081

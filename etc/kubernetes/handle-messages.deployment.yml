@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{KUB_SERVICE_NAME}-messages-handler-deployment"
+  namespace: "{KUB_NAMESPACE_PREFIX}-{BUILD_ENV}"
+  labels:
+    app: "{KUB_SERVICE_NAME}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{KUB_SERVICE_NAME}"
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: "{KUB_SERVICE_NAME}"
+        namespace: "{KUB_NAMESPACE_PREFIX}-{BUILD_ENV}"
+    spec:
+      containers:
+        - name: "{KUB_SERVICE_NAME}-handler"
+          image: localhost:32000/image:latest
+          imagePullPolicy: Always
+          command:
+            - "/bin/sh"
+            - -c
+            - "npm run handle-messages --limit 10"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "250m"
+              memory: "512Mi"
