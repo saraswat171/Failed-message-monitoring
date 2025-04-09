@@ -57,4 +57,4 @@ module.exports = {
     await queryInterface.dropTable("poison_message");
     await queryInterface.sequelize.query('DROP TYPE "enum_poison_message_state";');
   }
-};
+}; 
