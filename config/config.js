@@ -42,7 +42,7 @@ module.exports = {
                 required: true,
                 rejectUnauthorized: true,
                 ca: process.env.DB_CERTIFICATE
-            } : false // If DB_CERTIFICATE is not set, SSL is disabled
+            } : false 
         },
         "retry": {
             "match": [
