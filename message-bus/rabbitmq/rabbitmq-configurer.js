@@ -23,4 +23,4 @@ class RabbitMQConfigurer {
 
 module.exports = {
     RabbitMQConfigurer
-}
+} 
