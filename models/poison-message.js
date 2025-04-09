@@ -58,15 +58,8 @@ module.exports = (sequelize, DataTypes) => {
         getAppId() {
             const endpoint = this.getDataValue("endpoint");
 
-            // if (endpoint === null) {
-            //     throw new Error("Endpoint does not exist.");
-            // }
 
             const appId = endpoint?.name;
-
-            // if (appId === null) {
-            //     throw new Error("App name does not exist.")
-            // }
 
             return appId;
         }

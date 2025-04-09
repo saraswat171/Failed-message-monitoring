@@ -25,7 +25,7 @@ variables:
   # This instructs Docker not to start over TLS.
   DOCKER_TLS_CERTDIR: ""
 
-  CONTAINER_IMAGE: keshavsaini22/failed-messages-monitoring:latestv1
+  CONTAINER_IMAGE: chetandoc14/failed-message-monitoring:latest
 
   #BRANCH
   FEATURE_BRANCH: /^feature\/.*/
@@ -36,7 +36,7 @@ variables:
 
 stages:
   - build
-  - deploy
+  # - deploy
 
 
 
@@ -58,18 +58,18 @@ build-develop:
 
 
   
-kubernetes-develop:
-  stage: deploy
-  image:
-    name: bitnami/kubectl:latest
-    entrypoint:
-      - ""
-  dependencies:
-    - build-develop
-  before_script:
-    - BUILD_ENV=production
-  script:
-    - 'echo "${KUBE_CONFIG}" > /.kube/config'
-    - ./etc/ci-cd/deploy.kubectl.sh .
-  rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ $FEATURE_BRANCH
+# kubernetes-develop:
+#   stage: deploy
+#   image:
+#     name: bitnami/kubectl:latest
+#     entrypoint:
+#       - ""
+#   dependencies:
+#     - build-develop
+#   before_script:
+#     - BUILD_ENV=production
+#   script:
+#     - 'echo "${KUBE_CONFIG}" > /.kube/config'
+#     - ./etc/ci-cd/deploy.kubectl.sh .
+#   rules:
+#     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ $FEATURE_BRANCH
